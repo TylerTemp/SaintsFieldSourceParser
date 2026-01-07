@@ -61,21 +61,21 @@ namespace SaintsFieldSourceParser
 
             if (pathToSave is null)
             {
-                Utils.DebugToFile($"!!!!!!!!!!!!!NOTFOUND");
+                DebugToFile($"!!!!!!!!!!!!!NOTFOUND");
                 return;
             }
 
             try
             {
-                string nameSpace = "";
+                // string nameSpace = "";
 
                 foreach (SyntaxTree tree in context.Compilation.SyntaxTrees)
                 {
                     // DebugToFile($"Processing {tree.FilePath}");
-                    if (tree.FilePath.Contains("Part1"))
-                    {
-                        DebugToFile(tree.FilePath);
-                    }
+                    // if (tree.FilePath.Contains("Part1"))
+                    // {
+                    //     DebugToFile(tree.FilePath);
+                    // }
                     SourceText csText = tree.GetText();
                     ImmutableArray<byte> csCheckSum = csText.GetChecksum();
                     string csB64 = Convert.ToBase64String(csCheckSum.ToArray());
@@ -280,6 +280,11 @@ namespace SaintsFieldSourceParser
                 genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters
             );
             string assemblyName = namedTypeSymbol.ContainingAssembly.Name;
+            if (assemblyName.StartsWith("Unity.") || assemblyName.StartsWith("UnityEngine.") ||
+                assemblyName.StartsWith("UnityEditor."))
+            {
+                return;
+            }
 
             string assFolder = $"{pathToSave}/{assemblyName}";
 
@@ -347,7 +352,7 @@ namespace SaintsFieldSourceParser
                         List<string> methodParameterTypes = new List<string>();
                         foreach (IParameterSymbol parameterSymbol in methodSymbol.Parameters)
                         {
-                            var paraType = parameterSymbol.Type.ToDisplayString(format);
+                            string paraType = parameterSymbol.Type.ToDisplayString(format);
                             methodParameterTypes.Add(paraType);
                         }
                         lines.Add($"Method {methodReturnType} | {methodName} | {string.Join(" ; ", methodParameterTypes)}");
@@ -375,7 +380,7 @@ namespace SaintsFieldSourceParser
         {
             return Regex.Replace(
                 fullGenericName,
-                @"<([^<>]+)>",
+                "<([^<>]+)>",
                 m =>
                 {
                     // Count generic parameters by commas
