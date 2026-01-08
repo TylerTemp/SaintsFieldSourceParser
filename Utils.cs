@@ -7,7 +7,7 @@ namespace SaintsFieldSourceParser
 {
     public static class Utils
     {
-        public static bool Debug = true;
+        public static bool Debug = false;
         private static string _tempFolderPath;
         public static void DebugToFile(string toWrite, [CallerLineNumber] int lineNumber = 0)
         {
